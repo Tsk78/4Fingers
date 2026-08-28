@@ -1,14 +1,7 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { ToastContext } from '@/context/ToastContext';
 
 // FIFO toast queue — at most one toast visible at a time (design.md §3.4,
 // Requirement 3.7). New toasts queue; the current one auto-dismisses and the
@@ -19,20 +12,6 @@ const TOAST_DURATION_MS = 3000;
 interface ToastMessage {
   id: number;
   text: string;
-}
-
-interface ToastContextValue {
-  enqueue: (text: string) => void;
-}
-
-const ToastContext = createContext<ToastContextValue | null>(null);
-
-export function useToast(): ToastContextValue {
-  const ctx = useContext(ToastContext);
-  if (ctx === null) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return ctx;
 }
 
 let nextToastId = 1;

@@ -7,6 +7,7 @@ export const DEFAULT_USER_STATE: UserState = {
   xp: 0,
   rank: 'Explorer',
   unlockedSpecies: [],
+  unlockedQuests: [],
   completedQuests: [],
   badges: [],
   visitedExhibits: [],
@@ -74,15 +75,16 @@ export function appStateReducer(state: UserState, action: AppAction): UserState 
 
     case 'QUEST_UNLOCKED': {
       const { questId } = action.payload;
-      // Unlocking just makes a quest visible; it does not complete it.
-      // Tracked via a dedicated list on the quest data side; here we no-op if
-      // already completed. Unlock visibility is derived in the Quests tab from
-      // seeded + dynamically-unlocked quest ids held in component/data layer.
-      // We still record the intent so cross-tab consumers can react.
-      if (state.completedQuests.includes(questId)) {
+      // Unlocking makes a quest visible on the Quests tab (Requirement 3.5);
+      // it does not complete it. Idempotent — no duplicate if already unlocked
+      // or already completed.
+      if (
+        state.unlockedQuests.includes(questId) ||
+        state.completedQuests.includes(questId)
+      ) {
         return state;
       }
-      return state;
+      return { ...state, unlockedQuests: [...state.unlockedQuests, questId] };
     }
 
     case 'QUEST_COMPLETED': {

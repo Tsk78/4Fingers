@@ -1,7 +1,10 @@
 // Core data model — single source of truth for shared app state.
 // See design.md §3.2. No component should redefine these shapes.
 
-export const SCHEMA_VERSION = 1;
+// Bumped to 2 in Phase 2: added `unlockedQuests` so dynamically-unlocked
+// quests (e.g. the Map's Double XP quest) surface on the Quests tab.
+// Older persisted state without this field falls back to defaults.
+export const SCHEMA_VERSION = 2;
 
 export type RankName = 'Explorer' | 'Junior Ranger' | 'Senior Ranger' | 'Master Ranger';
 
@@ -33,6 +36,8 @@ export interface UserState {
   rank: RankName;
   /** species IDs only — never raw image data (Requirement 4.6). */
   unlockedSpecies: string[];
+  /** quest IDs made visible dynamically (e.g. Double XP from the Map tab). */
+  unlockedQuests: string[];
   completedQuests: string[];
   badges: string[];
   visitedExhibits: string[];

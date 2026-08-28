@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { AppStateContext, type AppStateContextValue } from '@/context/AppStateContext';
+import { AppStateContext, type AppStateContextValue } from '@/context/appStateContextValue';
 
 /** Typed accessor for shared app state with a null-check throw. */
 export function useAppState(): AppStateContextValue {
