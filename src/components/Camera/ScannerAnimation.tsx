@@ -32,12 +32,12 @@ export function ScannerAnimation() {
           />
         ))}
 
-        {/* Sweeping scan line */}
+        {/* Sweeping scan line — animates transform only (design.md §8). */}
         {!reducedMotion && (
           <motion.div
-            className="absolute inset-x-2 h-0.5 bg-leaf-light shadow-[0_0_12px_2px_rgba(111,215,154,0.8)]"
-            initial={{ top: '8%', opacity: 0.9 }}
-            animate={{ top: ['8%', '92%', '8%'] }}
+            className="absolute inset-x-2 top-0 h-0.5 bg-leaf-light shadow-[0_0_12px_2px_rgba(111,215,154,0.8)]"
+            initial={{ y: 16, opacity: 0.9 }}
+            animate={{ y: [16, 208, 16] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}

@@ -7,6 +7,8 @@ import { MapTab } from '@/components/Map/MapTab';
 import { CameraTab } from '@/components/Camera/CameraTab';
 import { QuestsTab } from '@/components/Quests/QuestsTab';
 import { JournalTab } from '@/components/Journal/JournalTab';
+import { SettingsMenu } from '@/components/SettingsMenu';
+import { InstallPromptOverlay } from '@/components/Onboarding/InstallPromptOverlay';
 
 function CurrentTab({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -29,10 +31,17 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-jungle to-jungle-dark text-mist">
-      <main className="mx-auto max-w-md px-4 pb-28 pt-6">
+      <header className="mx-auto flex max-w-md items-center justify-between px-4 pt-4">
+        <span className="text-sm font-semibold uppercase tracking-widest text-leaf-light">
+          WildDex
+        </span>
+        <SettingsMenu />
+      </header>
+      <main className="mx-auto max-w-md px-4 pb-28 pt-2">
         <CurrentTab tab={activeTab} />
       </main>
       <BottomNavigation active={activeTab} onChange={setActiveTab} />
+      <InstallPromptOverlay />
     </div>
   );
 }

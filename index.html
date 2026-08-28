@@ -9,12 +9,20 @@
     <title>Mandai WildDex &amp; Ranger Expeditions</title>
 
     <!-- iOS PWA meta tags (Requirement 7.3 / design.md §7).
-         Manifest link + service worker registration are added in Phase 6. -->
+         The manifest <link> + service-worker registration are injected
+         automatically by vite-plugin-pwa at build time. -->
     <meta name="theme-color" content="#0f3d2e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="WildDex" />
     <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Apple touch icon + iOS launch image (real supplied art). -->
+    <link rel="apple-touch-icon" href="/icons/app_icon_leaf.png" />
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/splash_screen.png"
+    />
   </head>
   <body>
     <div id="root"></div>
