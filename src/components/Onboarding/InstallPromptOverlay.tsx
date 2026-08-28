@@ -5,15 +5,32 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { JungleButton } from '@/components/JungleButton';
 
 /**
+ * True when the app is already running as an installed PWA (launched from the
+ * Home Screen), so the "how to install" prompt is pointless. Covers iOS Safari
+ * (`navigator.standalone`) and the standard `display-mode: standalone` query.
+ */
+function isRunningStandalone(): boolean {
+  if (typeof window === 'undefined') return false;
+  const iosStandalone =
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+  const displayStandalone =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(display-mode: standalone)').matches;
+  return iosStandalone || displayStandalone;
+}
+
+/**
  * iOS "Add to Home Screen" explainer (Requirement 7.1). Shown once, gated on
  * state.hasSeenInstallPrompt; dismissal is persisted via INSTALL_PROMPT_DISMISSED
- * (Requirement 7.2). Non-blocking of the underlying app when dismissed.
+ * (Requirement 7.2). Also suppressed entirely when the app is already installed
+ * (running in standalone mode). Non-blocking of the underlying app when dismissed.
  */
 export function InstallPromptOverlay() {
   const { state, dispatch } = useAppState();
   const reducedMotion = useReducedMotion();
 
-  if (state.hasSeenInstallPrompt) return null;
+  // Don't nag if already dismissed OR already installed/standalone.
+  if (state.hasSeenInstallPrompt || isRunningStandalone()) return null;
 
   const dismiss = () => dispatch({ type: 'INSTALL_PROMPT_DISMISSED' });
 
