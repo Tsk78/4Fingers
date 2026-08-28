@@ -52,6 +52,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4"
+        style={{ top: 'calc(env(safe-area-inset-top) + 1rem)' }}
         aria-live="polite"
         aria-atomic="true"
       >
