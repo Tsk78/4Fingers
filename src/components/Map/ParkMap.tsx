@@ -19,10 +19,19 @@ interface ViewBox {
   h: number;
 }
 
-const INITIAL_VIEWBOX: ViewBox = { x: 0, y: 0, w: VIEWBOX_WIDTH, h: VIEWBOX_HEIGHT };
 const MIN_W = VIEWBOX_WIDTH * 0.35; // most zoomed-in
 const MAX_W = VIEWBOX_WIDTH; // fully zoomed-out (can't see less than full map)
 const ZOOM_STEP = 0.8; // button zoom factor per click
+
+// Open one "+" click zoomed in (design tweak): width one ZOOM_STEP below full,
+// centered on the map. Equivalent to the initial full view then a single zoom-in.
+const INITIAL_W = VIEWBOX_WIDTH * ZOOM_STEP;
+const INITIAL_VIEWBOX: ViewBox = {
+  x: (VIEWBOX_WIDTH - INITIAL_W) / 2,
+  y: (VIEWBOX_HEIGHT - INITIAL_W) / 2,
+  w: INITIAL_W,
+  h: INITIAL_W,
+};
 
 function clampViewBox(vb: ViewBox): ViewBox {
   // keep aspect ratio square and within [MIN_W, MAX_W]
