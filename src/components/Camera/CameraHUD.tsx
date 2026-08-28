@@ -22,6 +22,7 @@ export const CameraHUD = forwardRef<HTMLVideoElement, CameraHUDProps>(
         <div className="relative aspect-[3/4] w-full overflow-hidden rounded-card border border-white/10 bg-jungle-dark">
           <video
             ref={videoRef}
+            autoPlay
             playsInline
             muted
             className="h-full w-full object-cover"

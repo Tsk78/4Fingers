@@ -31,7 +31,10 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-jungle to-jungle-dark text-mist">
-      <header className="mx-auto flex max-w-md items-center justify-between px-4 pt-4">
+      <header
+        className="mx-auto flex max-w-md items-center justify-between px-4 pt-4"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1.25rem)' }}
+      >
         <span className="text-sm font-semibold uppercase tracking-widest text-leaf-light">
           WildDex
         </span>

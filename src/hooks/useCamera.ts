@@ -31,6 +31,8 @@ export function useCamera(): UseCameraResult {
   const [state, setState] = useState<CameraState>('idle');
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  // Held in state so an effect can attach it once the <video> is mounted.
+  const [stream, setStream] = useState<MediaStream | null>(null);
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -40,6 +42,7 @@ export function useCamera(): UseCameraResult {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    setStream(null);
   }, []);
 
   const requestCamera = useCallback(async () => {
@@ -55,13 +58,11 @@ export function useCamera(): UseCameraResult {
 
     setState('requesting');
     try {
-      const stream = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        // play() can reject if interrupted; ignore — feed still attaches.
-        void videoRef.current.play().catch(() => undefined);
-      }
+      const mediaStream = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
+      streamRef.current = mediaStream;
+      // Flip to 'granted' first so CameraHUD mounts the <video>, THEN attach
+      // the stream via the effect below (the element doesn't exist until now).
+      setStream(mediaStream);
       setState('granted');
     } catch {
       // NotAllowedError, NotFoundError, insecure context, etc. — treat uniformly
@@ -69,6 +70,21 @@ export function useCamera(): UseCameraResult {
       setState('denied');
     }
   }, []);
+
+  // Attach the stream to the <video> once BOTH exist (element is mounted after
+  // state flips to 'granted'). This fixes the attach-before-mount race.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !stream) return;
+    if (video.srcObject !== stream) {
+      video.srcObject = stream;
+    }
+    const tryPlay = () => void video.play().catch(() => undefined);
+    tryPlay();
+    // Retry once metadata is ready, covering the autoplay/attach race.
+    video.addEventListener('loadedmetadata', tryPlay);
+    return () => video.removeEventListener('loadedmetadata', tryPlay);
+  }, [stream, state]);
 
   const captureFrame = useCallback((): string | null => {
     const video = videoRef.current;
@@ -83,8 +99,15 @@ export function useCamera(): UseCameraResult {
     return canvas.toDataURL('image/jpeg', 0.7);
   }, []);
 
-  // Cleanup on unmount — release the camera.
-  useEffect(() => stopCamera, [stopCamera]);
+  // Release the camera when the acquired stream is replaced or on true unmount.
+  // Tying teardown to the specific `stream` avoids React StrictMode's dev-only
+  // double-invoke stopping the live stream right after we acquire it.
+  useEffect(() => {
+    if (!stream) return;
+    return () => {
+      stream.getTracks().forEach((t) => t.stop());
+    };
+  }, [stream]);
 
   return {
     state,
